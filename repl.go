@@ -2,18 +2,64 @@ package main
 
 import(
 	"strings"
-	// "fmt"
+	"bufio"
+	"os"
+	"fmt"
 )
+
+type cliCommand struct {
+	name        string
+	description string
+	callback    func() error
+}
+
+
+func StartRepl() {
+	scanner := bufio.NewScanner(os.Stdin)
+	for {
+		fmt.Print("Pokedex > ")
+		scanner.Scan()
+
+		text := scanner.Text()
+		words := cleanInput(text)
+		if len(words) == 0 {
+			continue
+		}
+
+		command := words[0]
+
+		com, ok := getCommands()[command]
+
+		if !ok {
+			fmt.Printf("Unknown command\n")
+			continue
+		}
+
+		if err := com.callback(); err != nil {
+			fmt.Printf("error in callback: %s\n", err)
+		}
+	}
+}
 
 func cleanInput(text string) []string {
 	lower := strings.ToLower(text)
-	// fmt.Print(lower)
-	split := strings.Split(lower, " ")
-	var output []string
-	for _, word := range(split) {
-		if word != "" {
-			output = append(output, word)
-		}
+	split := strings.Fields(lower)
+	return split
+}
+
+
+func getCommands() map[string]cliCommand {
+	registry := map[string]cliCommand{
+		"exit": {
+			name:		"exit",
+			description:"Exit the Pokedex",
+			callback:	commandExit,
+		},
+		"help": {
+			name:		"help",
+			description:"Displays a help message",
+			callback: 	commandHelp,
+		},
 	}
-	return output
+	return registry
 }

@@ -1,9 +1,20 @@
 package main
 
 import (
-
+	"net/http"
+	"pokedexcli/internal/pokeapi"
 )
 
+type config struct {
+	client		*http.Client
+	next		*string
+	previous	*string
+}
+
 func main() {
-	StartRepl()
+	conf := config{
+		client: pokeapi.NewClient(),
+	}
+
+	StartRepl(&conf)
 }

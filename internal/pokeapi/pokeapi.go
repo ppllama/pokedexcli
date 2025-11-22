@@ -1,9 +1,11 @@
 package pokeapi
 
-import(
-	"fmt"
-	"net/http"
+import (
 	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"pokedexcli/internal/pokecache"
 )
 
 
@@ -21,11 +23,21 @@ func NewClient() *http.Client {
 	return &http.Client{}
 }
 
-func GetLocationArea(url string, client *http.Client) (LocationArea, error) {
+func GetLocationArea(url string, client *http.Client, cache *pokecache.Cache) (LocationArea, error) {
+
+	var location LocationArea
+
+	data, ok := cache.Get(url)
+	if ok {
+		if err := json.Unmarshal(data, &location); err != nil {
+			return location, fmt.Errorf("error getting location cache")
+		}
+		fmt.Println("locations retrieved from cache")
+		return location, nil
+	}
 
 	req, err := http.NewRequest("GET", url, nil)
 
-	var location LocationArea
 	if err != nil {
 		return location, fmt.Errorf("error creating api request: %s", err)
 	}
@@ -37,10 +49,16 @@ func GetLocationArea(url string, client *http.Client) (LocationArea, error) {
 
 	defer res.Body.Close()
 
-	decoder := json.NewDecoder(res.Body)
-	if err := decoder.Decode(&location); err != nil {
-		return location, fmt.Errorf("error decoding api response: %s", err)
+	newData, err := io.ReadAll(res.Body)
+	if err != nil {
+		return location, fmt.Errorf("error reading response: %s", err)
 	}
 
+	if err := json.Unmarshal(newData, &location); err != nil {
+		return location, fmt.Errorf("error decoding api response %s", err)
+	}
+
+	cache.Add(url, newData)
+	
 	return location, nil
 }

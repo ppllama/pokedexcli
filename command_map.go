@@ -9,13 +9,13 @@ func commandMap(config *config) error {
 
 	var location pokeapi.LocationArea
 	if config.next == nil {
-		loc, err := pokeapi.GetLocationArea("https://pokeapi.co/api/v2/location-area", config.client)
+		loc, err := pokeapi.GetLocationArea("https://pokeapi.co/api/v2/location-area?offset=0&limit=20", config.client, config.cache)
 		if err != nil {
 			return fmt.Errorf("error in getting location: %s", err)
 		}
 		location = loc
 	} else {
-		loc, err := pokeapi.GetLocationArea(*config.next, config.client)
+		loc, err := pokeapi.GetLocationArea(*config.next, config.client, config.cache)
 		if err != nil {
 			return fmt.Errorf("error in getting location %s", err)
 		}
@@ -43,7 +43,7 @@ func commandMapb(config *config) error {
 		fmt.Println("you're on the first page")
 		return nil
 	} else {
-		loc, err := pokeapi.GetLocationArea(*config.previous, config.client)
+		loc, err := pokeapi.GetLocationArea(*config.previous, config.client, config.cache)
 		if err != nil {
 			return fmt.Errorf("error in getting location %s", err)
 		}

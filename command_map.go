@@ -5,7 +5,7 @@ import(
 	"pokedexcli/internal/pokeapi"
 )
 
-func commandMap(config *config) error {
+func commandMap(config *config, _ string) error {
 
 	var location pokeapi.LocationArea
 	if config.next == nil {
@@ -36,7 +36,7 @@ func commandMap(config *config) error {
 	return nil
 }
 
-func commandMapb(config *config) error {
+func commandMapb(config *config, _ string) error {
 
 	var location pokeapi.LocationArea
 	if config.previous == nil {

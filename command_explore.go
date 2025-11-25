@@ -5,16 +5,16 @@ import(
 	"pokedexcli/internal/pokeapi"
 )
 
-func commandExplore(config *config, name string) error {
+func commandExplore(config *config, area string) error {
 
 	var pokemonList pokeapi.PokemonList
 
-	if name == "" {
+	if area == "" {
 		return fmt.Errorf("please provide area name")
 	}
 
-	fmt.Printf("Exploring %s...\n", name)
-	pok, err := pokeapi.GetPokemonList(name, config.client, config.cache)
+	fmt.Printf("Exploring %s...\n", area)
+	pok, err := pokeapi.GetPokemonList(area, config.client, config.cache)
 	if err != nil {
 		return fmt.Errorf("error in getting pokemonlist: %s", err)
 	}
